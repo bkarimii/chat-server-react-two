@@ -6,7 +6,9 @@ import "./MsgForm.css";
 export default function MsgForm() {
   const [msgText, setMsgText] = useState("");
   const [sender, setSender] = useState("");
+  const [latestMsgs, setLatestMsgs] = useState([]);
 
+  // this function post new messages from input into server
   async function postData(url = "", data = {}) {
     // Default options are marked with *
     const response = await fetch(url, {
@@ -40,7 +42,13 @@ export default function MsgForm() {
           return response;
         }
       })
-      .then((data) => console.log(data))
+      .then((data) => {
+        console.log(data);
+        fetchLatestmsgs(linkLatest).then((latestMsgs) => {
+          setLatestMsgs(latestMsgs);
+          console.log(latestMsgs, "this is latest mssg");
+        });
+      })
       .catch((error) => {
         console.error(error);
       });
@@ -55,6 +63,25 @@ export default function MsgForm() {
   const handleInputFrom = (e) => {
     setSender(e.target.value);
   };
+
+  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //this function fetch Latest Msgs from server
+  const runkitLinkLatest =
+    "https://chat-server-behrouz-karimi-5l4glcbel8q1.runkit.sh/messages/latest";
+
+  const linkLatest = "http://localhost:9090/messages/latest";
+  const fetchLatestmsgs = async (url) => {
+    try {
+      const response = await fetch(url);
+      const data = await response.json();
+
+      return data;
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   return (
     <>
       <form onSubmit={chatInfo}>
