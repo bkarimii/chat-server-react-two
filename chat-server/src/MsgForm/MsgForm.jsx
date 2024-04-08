@@ -1,5 +1,7 @@
 import { React, useState, useEffect } from "react";
 import "./MsgForm.css";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faTrash, faUser } from "@fortawesome/free-solid-svg-icons";
 
 // import { send } from "vite";
 
@@ -7,6 +9,7 @@ export default function MsgForm() {
   const [msgText, setMsgText] = useState("");
   const [sender, setSender] = useState("");
   const [latestMsgs, setLatestMsgs] = useState([]);
+  const [msgId, setMsgId] = useState(null);
 
   // this function post new messages from input into server
   async function postData(url = "", data = {}) {
@@ -82,6 +85,55 @@ export default function MsgForm() {
     }
   };
 
+  const chatDisplay = (arr) => {
+    return arr.map((item, index) => {
+      return (
+        <li key={index} id="chat-history">
+          <div>
+            <span>
+              <FontAwesomeIcon icon={faUser} />
+            </span>
+            <span id="users-name"> {item.from}</span>
+            {/* <FontAwesomeIcon icon={faEdit} /> */}
+            <p>{item.text}</p>
+            <span>{item.sentTime}</span>
+          </div>
+          <span>
+            <FontAwesomeIcon
+              icon={faTrash}
+              onClick={() => handleDeleteClick(item.id)}
+            />
+          </span>
+          {/* <DeleteMsg msgId={item.id} /> */}
+        </li>
+      );
+    });
+  };
+  ///////////////////////////////////////////
+  const handleDeleteClick = async (msgId) => {
+    try {
+      if (msgId) {
+        const response = await fetch(
+          `http://localhost:9090/messages/${msgId}`,
+          {
+            method: "DELETE",
+          }
+        );
+        if (response.ok) {
+          //update latest messages locallly as well
+          setLatestMsgs((prevMsg) => prevMsg.filter((msg) => msg.id !== msgId));
+          const data = await response.text();
+          console.log(data);
+        } else {
+          const data = await response.text();
+        }
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+  /////////////////////////////////////////////////////////////////////////
+
   return (
     <>
       <form onSubmit={chatInfo}>
@@ -106,6 +158,7 @@ export default function MsgForm() {
         </div>
         <button type="submit">Send</button>
       </form>
+      <div>{chatDisplay(latestMsgs)}</div>
     </>
   );
 }
