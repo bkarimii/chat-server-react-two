@@ -8,8 +8,14 @@ import SearchMsgs from "./SearchMsgs/SearchMsgs";
 function App() {
   return (
     <>
-      <SearchMsgs />
-      <MsgForm />
+      <div id="main-div">
+        <div>
+          <MsgForm />
+        </div>
+        <div>
+          <SearchMsgs />
+        </div>
+      </div>
     </>
   );
 }

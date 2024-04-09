@@ -10,6 +10,7 @@ export default function MsgForm() {
   const [sender, setSender] = useState("");
   const [latestMsgs, setLatestMsgs] = useState([]);
   const [msgId, setMsgId] = useState(null);
+  const [hideChat, setHideChat] = useState(false);
 
   // this function post new messages from input into server
   async function postData(url = "", data = {}) {
@@ -37,7 +38,7 @@ export default function MsgForm() {
       from: sender,
       text: msgText,
     };
-    postData(link, postingObject)
+    postData(runkitLink, postingObject)
       .then((response) => {
         if (response.error) {
           return alert(response.error);
@@ -47,10 +48,7 @@ export default function MsgForm() {
       })
       .then((data) => {
         console.log(data);
-        fetchLatestmsgs(linkLatest).then((latestMsgs) => {
-          setLatestMsgs(latestMsgs);
-          console.log(latestMsgs, "this is latest mssg");
-        });
+        fetchLatestmsgs(runkitLinkLatest);
       })
       .catch((error) => {
         console.error(error);
@@ -78,12 +76,19 @@ export default function MsgForm() {
     try {
       const response = await fetch(url);
       const data = await response.json();
-
-      return data;
+      setLatestMsgs(data);
     } catch (error) {
       console.error(error);
     }
   };
+
+  useEffect(() => {
+    fetchLatestmsgs(runkitLinkLatest);
+    const interval = setInterval(() => {
+      fetchLatestmsgs(linkLatest);
+    }, 3000);
+    return clearInterval(interval);
+  }, []);
 
   const chatDisplay = (arr) => {
     return arr.map((item, index) => {
@@ -113,12 +118,9 @@ export default function MsgForm() {
   const handleDeleteClick = async (msgId) => {
     try {
       if (msgId) {
-        const response = await fetch(
-          `http://localhost:9090/messages/${msgId}`,
-          {
-            method: "DELETE",
-          }
-        );
+        const response = await fetch(`${runkitLink}/${msgId}`, {
+          method: "DELETE",
+        });
         if (response.ok) {
           //update latest messages locallly as well
           setLatestMsgs((prevMsg) => prevMsg.filter((msg) => msg.id !== msgId));
@@ -129,36 +131,47 @@ export default function MsgForm() {
         }
       }
     } catch (error) {
-      console.error(error);
+      console.error(error, "error happenede deleting");
     }
   };
   /////////////////////////////////////////////////////////////////////////
 
+  const toggleVisibility = () => {
+    setHideChat(!hideChat);
+  };
+
   return (
     <>
-      <form onSubmit={chatInfo}>
-        <div>
-          <label htmlFor="name">Name:</label>
-          <input
-            type="text"
-            placeholder="Name"
-            id="name"
-            value={sender}
-            onChange={handleInputFrom}
-          />
+      <div id="chat-holder">
+        <form onSubmit={chatInfo}>
+          <div>
+            <label htmlFor="name">Name:</label>
+            <input
+              type="text"
+              placeholder="Name"
+              id="name"
+              value={sender}
+              onChange={handleInputFrom}
+            />
+          </div>
+          <div>
+            <label htmlFor="message"> Message</label>
+            <input
+              type="text"
+              id="message"
+              value={msgText}
+              onChange={handleInputMsg}
+            />
+          </div>
+          <button type="submit">Send</button>
+        </form>
+        <button id="latest-button" onClick={toggleVisibility}>
+          {hideChat ? "Show Chat" : "Hide chat"}
+        </button>
+        <div style={{ display: hideChat ? "none" : "block" }}>
+          {chatDisplay(latestMsgs)}
         </div>
-        <div>
-          <label htmlFor="message"> Message</label>
-          <input
-            type="text"
-            id="message"
-            value={msgText}
-            onChange={handleInputMsg}
-          />
-        </div>
-        <button type="submit">Send</button>
-      </form>
-      <div>{chatDisplay(latestMsgs)}</div>
+      </div>
     </>
   );
 }
