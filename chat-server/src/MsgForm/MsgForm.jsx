@@ -157,6 +157,7 @@ export default function MsgForm() {
           <div>
             <label htmlFor="message"> Message</label>
             <input
+              placeholder="Your message"
               type="text"
               id="message"
               value={msgText}
