@@ -1,7 +1,8 @@
 import { React, useState, useEffect } from "react";
+import EditMsgs from "../EditMsgs/EditMsgs";
 import "./MsgForm.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faTrash, faUser } from "@fortawesome/free-solid-svg-icons";
+import { faTrash, faUser, faEdit } from "@fortawesome/free-solid-svg-icons";
 
 // import { send } from "vite";
 
@@ -96,15 +97,18 @@ export default function MsgForm() {
         <li key={index} id="chat-history">
           <div>
             <span>
-              <FontAwesomeIcon icon={faUser} />
+              <FontAwesomeIcon icon={faUser} className="fa" />
             </span>
             <span id="users-name"> {item.from}</span>
-            {/* <FontAwesomeIcon icon={faEdit} /> */}
-            <p>{item.text}</p>
+
+            <p>
+              {item.text} <EditMsgs text={item.text} />
+            </p>
             <span>{item.sentTime}</span>
           </div>
           <span>
             <FontAwesomeIcon
+              className="fa"
               icon={faTrash}
               onClick={() => handleDeleteClick(item.id)}
             />
