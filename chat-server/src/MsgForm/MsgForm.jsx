@@ -39,30 +39,35 @@ export default function MsgForm() {
       from: sender,
       text: msgText,
     };
-    postData(runkitLink, postingObject)
+    postData(link, postingObject)
       .then((response) => {
         if (response.error) {
           return alert(response.error);
         } else {
+          console.log(response, "this is response of post");
+
           return response;
         }
       })
-      .then((data) => {
-        console.log(data);
-        fetchLatestmsgs(runkitLinkLatest);
+      .then(() => {
+        fetchLatestmsgs(linkLatest);
+
+        console.log(latestMsgs, "latest msgs after post new msg");
+      })
+      .then(() => {
+        console.log(latestMsgs, "final");
       })
       .catch((error) => {
         console.error(error);
       });
     setMsgText("");
     setSender("");
-    console.log(postingObject);
   }
 
   const handleInputMsg = (e) => {
     setMsgText(e.target.value);
   };
-  const handleInputFrom = (e) => {
+  const handleInputSender = (e) => {
     setSender(e.target.value);
   };
 
@@ -84,10 +89,11 @@ export default function MsgForm() {
   };
 
   useEffect(() => {
-    fetchLatestmsgs(runkitLinkLatest);
+    fetchLatestmsgs(linkLatest);
     const interval = setInterval(() => {
       fetchLatestmsgs(linkLatest);
     }, 3000);
+    console.log("fetch");
     return clearInterval(interval);
   }, []);
 
@@ -102,7 +108,7 @@ export default function MsgForm() {
             <span id="users-name"> {item.from}</span>
 
             <p>
-              {item.text} <EditMsgs text={item.text} />
+              {item.text} <EditMsgs text={item.text} msgId={item.id} />
             </p>
             <span>{item.sentTime}</span>
           </div>
@@ -122,12 +128,18 @@ export default function MsgForm() {
   const handleDeleteClick = async (msgId) => {
     try {
       if (msgId) {
-        const response = await fetch(`${runkitLink}/${msgId}`, {
+        const response = await fetch(`${link}/${msgId}`, {
           method: "DELETE",
         });
         if (response.ok) {
           //update latest messages locallly as well
-          setLatestMsgs((prevMsg) => prevMsg.filter((msg) => msg.id !== msgId));
+          //setLatestMsgs((prevMsg) => prevMsg.filter((msg) => msg.id !== msgId));
+          // Fetch the latest messages from the server after deletion
+          // const latestResponse = await fetch(linkLatest);
+          // const latestData = await latestResponse.json();
+          // setLatestMsgs(latestData);
+          fetchLatestmsgs(linkLatest);
+
           const data = await response.text();
           console.log(data);
         } else {
@@ -155,7 +167,7 @@ export default function MsgForm() {
               placeholder="Name"
               id="name"
               value={sender}
-              onChange={handleInputFrom}
+              onChange={handleInputSender}
             />
           </div>
           <div>
