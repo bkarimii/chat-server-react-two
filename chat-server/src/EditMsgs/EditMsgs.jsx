@@ -1,24 +1,27 @@
-import { Reacct, useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faEdit } from "@fortawesome/free-solid-svg-icons";
+import { faEdit, faLocation } from "@fortawesome/free-solid-svg-icons";
 
-export default function EditMsgs({ text, msgId }) {
+export default function EditMsgs({ text, msgId, update }) {
   const [visibleEditing, setVisibleEditing] = useState(false);
   const [textForEdit, setTextForEdit] = useState(text);
-  const [editMsgId, seteditMsgId] = useState(msgId);
-  const [putFetchText, setPutFetchText] = useState({ text: "" });
 
-  const runkitLinkEdit = `https://chat-server-behrouz-karimi-5l4glcbel8q1.runkit.sh/messages/edit/${editMsgId}`;
-  const localLink = `http://localhost:9090/messages/edit/${editMsgId}`;
+  const runkitLinkEdit = `https://chat-server-behrouz-karimi-5l4glcbel8q1.runkit.sh/messages/edit/${msgId}`;
+  const localLink = `http://localhost:9090/messages/edit/${msgId}`;
 
-  const putFetch = async (url, body) => {
+  const putFetch = async (url) => {
     const requestOptions = {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(body),
+      body: JSON.stringify({ text: textForEdit }),
     };
-    const response = await fetch(url, requestOptions);
-    return response.json();
+
+    return fetch(url, requestOptions);
+    // const url1 = "http://localhost:9090/messages/latest";
+    // const response2 = await fetch(url1);
+
+    // console.log(msgId, "<----msgId", textForEdit, "textForEdit");
+    // return response2;
   };
 
   const handleClickEditIcon = () => {
@@ -29,23 +32,23 @@ export default function EditMsgs({ text, msgId }) {
     setVisibleEditing(!visibleEditing);
 
     // Update state with the text to be edited
-    setPutFetchText({ text: textForEdit });
-    console.log(msgId, "this is msgid");
-    console.log({ text: textForEdit }, "textofr edit put fetch");
+    // setPutFetchText({ text: textForEdit });
 
-    putFetch(localLink, { text: textForEdit })
+    putFetch(localLink, textForEdit)
       .then((response) => {
         if (!response.ok) {
-          console.log(response.ok);
           alert("Something went wrong!");
           console.error(response.statusText); // Log the error message
         } else {
-          return response.json();
+          update(msgId, textForEdit);
+          // return response.json();
 
           // Handle successful edit (e.g., display confirmation message)
         }
       })
-      .then((data) => console.log(data), "this is data inside put fetch")
+      // .then(() => {
+      //   fetchEditedMsg();
+      // })
       .catch((error) => console.error("Error during edit:", error)); // Handle any errors
   };
 
@@ -53,6 +56,12 @@ export default function EditMsgs({ text, msgId }) {
     setTextForEdit(e.target.value);
   };
 
+  //fetch the edited msgs
+  // const fetchEditedMsg = async () => {
+  //   const response = await fetch(`http://localhost:9090/messages/${msgId}`);
+  //   const data = await response.json();
+  //   console.log(data, "data for edited msgs");
+  // };
   return (
     <>
       <FontAwesomeIcon

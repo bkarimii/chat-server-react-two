@@ -44,18 +44,11 @@ export default function MsgForm() {
         if (response.error) {
           return alert(response.error);
         } else {
-          console.log(response, "this is response of post");
-
           return response;
         }
       })
       .then(() => {
         fetchLatestmsgs(linkLatest);
-
-        console.log(latestMsgs, "latest msgs after post new msg");
-      })
-      .then(() => {
-        console.log(latestMsgs, "final");
       })
       .catch((error) => {
         console.error(error);
@@ -88,19 +81,32 @@ export default function MsgForm() {
     }
   };
 
+  function updateLatestMsgs(id, newText) {
+    const updatedMsgs = [];
+    latestMsgs.forEach((msg) => {
+      if (msg.id === id) {
+        updatedMsgs.push({ ...msg, text: newText });
+      } else {
+        updatedMsgs.push(msg);
+      }
+    });
+    setLatestMsgs(updatedMsgs);
+  }
+
   useEffect(() => {
     fetchLatestmsgs(linkLatest);
     const interval = setInterval(() => {
       fetchLatestmsgs(linkLatest);
+      console.log("hi");
     }, 3000);
-    console.log("fetch");
-    return clearInterval(interval);
+
+    // return clearInterval(interval);
   }, []);
 
   const chatDisplay = (arr) => {
     return arr.map((item, index) => {
       return (
-        <li key={index} id="chat-history">
+        <li key={item.id} id="chat-history">
           <div>
             <span>
               <FontAwesomeIcon icon={faUser} className="fa" />
@@ -108,7 +114,12 @@ export default function MsgForm() {
             <span id="users-name"> {item.from}</span>
 
             <p>
-              {item.text} <EditMsgs text={item.text} msgId={item.id} />
+              {item.text}{" "}
+              <EditMsgs
+                text={item.text}
+                msgId={item.id}
+                update={updateLatestMsgs}
+              />
             </p>
             <span>{item.sentTime}</span>
           </div>
@@ -127,7 +138,7 @@ export default function MsgForm() {
   ///////////////////////////////////////////
   const handleDeleteClick = async (msgId) => {
     try {
-      if (msgId) {
+      if (msgId >= 0) {
         const response = await fetch(`${link}/${msgId}`, {
           method: "DELETE",
         });
@@ -141,7 +152,6 @@ export default function MsgForm() {
           fetchLatestmsgs(linkLatest);
 
           const data = await response.text();
-          console.log(data);
         } else {
           const data = await response.text();
         }
