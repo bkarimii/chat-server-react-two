@@ -25,7 +25,7 @@ export default function SearchMsgs() {
     const finalSearchTerm = searchTerm;
 
     if (finalSearchTerm.length !== 0) {
-      const data = await getSearchedMsgs(`${link}${finalSearchTerm}`);
+      const data = await getSearchedMsgs(`${runkitLink}${finalSearchTerm}`);
       setSearchedMsgs(data);
       console.log(data, "this is searched msgs");
     } else {

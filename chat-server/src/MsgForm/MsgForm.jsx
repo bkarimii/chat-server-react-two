@@ -39,7 +39,7 @@ export default function MsgForm() {
       from: sender,
       text: msgText,
     };
-    postData(link, postingObject)
+    postData(runkitLink, postingObject)
       .then((response) => {
         if (response.error) {
           return alert(response.error);
@@ -48,7 +48,7 @@ export default function MsgForm() {
         }
       })
       .then(() => {
-        fetchLatestmsgs(linkLatest);
+        fetchLatestmsgs(runkitLinkLatest);
       })
       .catch((error) => {
         console.error(error);
@@ -94,11 +94,11 @@ export default function MsgForm() {
   }
 
   useEffect(() => {
-    fetchLatestmsgs(linkLatest);
+    fetchLatestmsgs(runkitLinkLatest);
     const interval = setInterval(() => {
-      fetchLatestmsgs(linkLatest);
+      fetchLatestmsgs(runkitLinkLatest);
       console.log("hi");
-    }, 3000);
+    }, 30000);
 
     // return clearInterval(interval);
   }, []);
@@ -139,7 +139,7 @@ export default function MsgForm() {
   const handleDeleteClick = async (msgId) => {
     try {
       if (msgId >= 0) {
-        const response = await fetch(`${link}/${msgId}`, {
+        const response = await fetch(`${runkitLink}/${msgId}`, {
           method: "DELETE",
         });
         if (response.ok) {
@@ -149,7 +149,7 @@ export default function MsgForm() {
           // const latestResponse = await fetch(linkLatest);
           // const latestData = await latestResponse.json();
           // setLatestMsgs(latestData);
-          fetchLatestmsgs(linkLatest);
+          fetchLatestmsgs(runkitLinkLatest);
 
           const data = await response.text();
         } else {
@@ -202,3 +202,177 @@ export default function MsgForm() {
     </>
   );
 }
+
+// import { React, useState, useEffect } from "react";
+// import EditMsgs from "../EditMsgs/EditMsgs";
+// import "./MsgForm.css";
+// import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+// import { faTrash, faUser } from "@fortawesome/free-solid-svg-icons";
+
+// export default function MsgForm() {
+//   const [msgText, setMsgText] = useState("");
+//   const [sender, setSender] = useState("");
+//   const [latestMsgs, setLatestMsgs] = useState([]);
+//   const [hideChat, setHideChat] = useState(false);
+
+//   const runkitLink =
+//     "https://chat-server-behrouz-karimi-5l4glcbel8q1.runkit.sh/messages";
+//   const runkitLinkLatest =
+//     "https://chat-server-behrouz-karimi-5l4glcbel8q1.runkit.sh/messages/latest";
+
+//   async function postData(url = "", data = {}) {
+//     try {
+//       const response = await fetch(url, {
+//         method: "POST",
+//         mode: "cors",
+//         headers: {
+//           "Content-Type": "application/json",
+//         },
+//         redirect: "follow",
+//         body: JSON.stringify(data),
+//       });
+//       return response.json();
+//     } catch (error) {
+//       console.error("Error posting data:", error);
+//     }
+//   }
+
+//   function chatInfo(e) {
+//     e.preventDefault();
+//     const postingObject = {
+//       from: sender,
+//       text: msgText,
+//     };
+//     postData(runkitLink, postingObject)
+//       .then((response) => {
+//         if (response.error) {
+//           alert(response.error);
+//         } else {
+//           fetchLatestmsgs(runkitLinkLatest);
+//         }
+//       })
+//       .catch((error) => {
+//         console.error(error);
+//       });
+//     setMsgText("");
+//     setSender("");
+//   }
+
+//   const handleInputMsg = (e) => {
+//     setMsgText(e.target.value);
+//   };
+
+//   const handleInputSender = (e) => {
+//     setSender(e.target.value);
+//   };
+
+//   const fetchLatestmsgs = async (url) => {
+//     try {
+//       const response = await fetch(url);
+//       const data = await response.json();
+//       setLatestMsgs(data);
+//     } catch (error) {
+//       console.error("Error fetching latest messages:", error);
+//     }
+//   };
+
+//   function updateLatestMsgs(id, newText) {
+//     const updatedMsgs = latestMsgs.map((msg) =>
+//       msg.id === id ? { ...msg, text: newText } : msg
+//     );
+//     setLatestMsgs(updatedMsgs);
+//   }
+
+//   useEffect(() => {
+//     fetchLatestmsgs(runkitLinkLatest);
+//     const interval = setInterval(() => {
+//       fetchLatestmsgs(runkitLinkLatest);
+//     }, 3000);
+
+//     return () => clearInterval(interval);
+//   }, []);
+
+//   const chatDisplay = (arr) => {
+//     return arr.map((item) => (
+//       <li key={item.id} id="chat-history">
+//         <div>
+//           <span>
+//             <FontAwesomeIcon icon={faUser} className="fa" />
+//           </span>
+//           <span id="users-name"> {item.from}</span>
+//           <p>
+//             {item.text}{" "}
+//             <EditMsgs
+//               text={item.text}
+//               msgId={item.id}
+//               update={updateLatestMsgs}
+//             />
+//           </p>
+//           <span>{item.sentTime}</span>
+//         </div>
+//         <span>
+//           <FontAwesomeIcon
+//             className="fa"
+//             icon={faTrash}
+//             onClick={() => handleDeleteClick(item.id)}
+//           />
+//         </span>
+//       </li>
+//     ));
+//   };
+
+//   const handleDeleteClick = async (msgId) => {
+//     try {
+//       const response = await fetch(`${runkitLink}/${msgId}`, {
+//         method: "DELETE",
+//       });
+//       if (response.ok) {
+//         fetchLatestmsgs(runkitLinkLatest);
+//       } else {
+//         console.error("Failed to delete message");
+//       }
+//     } catch (error) {
+//       console.error("Error deleting message:", error);
+//     }
+//   };
+
+//   const toggleVisibility = () => {
+//     setHideChat(!hideChat);
+//   };
+
+//   return (
+//     <>
+//       <div id="chat-holder">
+//         <form onSubmit={chatInfo}>
+//           <div>
+//             <label htmlFor="name">Name:</label>
+//             <input
+//               type="text"
+//               placeholder="Name"
+//               id="name"
+//               value={sender}
+//               onChange={handleInputSender}
+//             />
+//           </div>
+//           <div>
+//             <label htmlFor="message"> Message</label>
+//             <input
+//               placeholder="Your message"
+//               type="text"
+//               id="message"
+//               value={msgText}
+//               onChange={handleInputMsg}
+//             />
+//           </div>
+//           <button type="submit">Send</button>
+//         </form>
+//         <button id="latest-button" onClick={toggleVisibility}>
+//           {hideChat ? "Show Chat" : "Hide chat"}
+//         </button>
+//         <div style={{ display: hideChat ? "none" : "block" }}>
+//           {chatDisplay(latestMsgs)}
+//         </div>
+//       </div>
+//     </>
+//   );
+// }

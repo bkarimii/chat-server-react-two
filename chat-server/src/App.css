@@ -1,0 +1,11 @@
+/* App.css */
+#main-div {
+    display: flex;
+    justify-content: space-around;
+    padding: 20px;
+    background-color: #f5f5f5;
+}
+
+#main-div>div {
+    width: 45%;
+}

@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEdit, faLocation } from "@fortawesome/free-solid-svg-icons";
+import "./EditMsg.css";
 
 export default function EditMsgs({ text, msgId, update }) {
   const [visibleEditing, setVisibleEditing] = useState(false);
@@ -34,7 +35,7 @@ export default function EditMsgs({ text, msgId, update }) {
     // Update state with the text to be edited
     // setPutFetchText({ text: textForEdit });
 
-    putFetch(localLink, textForEdit)
+    putFetch(runkitLinkEdit, textForEdit)
       .then((response) => {
         if (!response.ok) {
           alert("Something went wrong!");
